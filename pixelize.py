@@ -12,7 +12,7 @@ from .src.stupid import MLP_code
 
 from invokeai.app.invocations.primitives import ImageField, ImageOutput
 from invokeai.backend.util.devices import TorchDevice
-from invokeai.invocation_api import BaseInvocation, InputField, InvocationContext, WithMetadata, invocation
+from invokeai.invocation_api import BaseInvocation, InputField, InvocationContext, WithMetadata, WithBoard, invocation
 
 GA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models/160_net_G_A.pth")
 ALIAS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models/alias_net.pth")
@@ -106,9 +106,9 @@ def save(tensor, cell_size, best_cell_size=4):
     title="Pixelize Image",
     tags=["image", "retro", "pixel", "pixel art"],
     category="image",
-    version="1.0.0",
+    version="1.0.1",
 )
-class PixelizeImageInvocation(BaseInvocation, WithMetadata):
+class PixelizeImageInvocation(BaseInvocation, WithMetadata, WithBoard):
     """Creates 'pixel' 'art' using trained models"""
 
     image: ImageField = InputField(description="The image to pixelize")
@@ -126,6 +126,7 @@ class PixelizeImageInvocation(BaseInvocation, WithMetadata):
         out_image = m.pixelize(image, self.cell_size)
 
         del m
+        TorchDevice.empty_cache()
 
         image_dto = context.images.save(image=out_image)
 
