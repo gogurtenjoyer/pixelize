@@ -24,3 +24,7 @@ This node accepts an image input - the above example shows how to save a 'copy' 
 # Notes
 
 Apologies, but the original implementation only works on CUDA devices. I'm working on changing this, but am not done yet. Also, the models required do not have the same license as this code, so please double check the original implementation repo when downloading them.
+
+# Example
+
+![example](pixelize-example.png)
