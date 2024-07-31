@@ -20,3 +20,7 @@ These can be found at the original github link above (they are Google Drive link
 This node accepts an image input - the above example shows how to save a 'copy' of a generated image to a new 'Pixel Art' Board.
 
 **Cell Size** - this setting controls how large the pixels are; in other words, how much the image is downscaled perceptually. A cell size of 2 works well for smaller SD 1.5 images, and 3-4 is better for larger SDXL images.
+
+# Notes
+
+Apologies, but the original implementation only works on CUDA devices. I'm working on changing this, but am not done yet. Also, the models required do not have the same license as this code, so please double check the original implementation repo when downloading them.
