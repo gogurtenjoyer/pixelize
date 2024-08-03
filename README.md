@@ -28,3 +28,22 @@ Apologies, but the original implementation only works on CUDA devices. I'm worki
 # Example
 
 ![example](pixelize-example.png)
+
+# More Examples
+<details>
+<summary>(quite a lot)</summary>
+
+* ![screenshot](examples/example1.png)
+* ![screenshot](examples/example2.png)
+* ![screenshot](examples/example3.png)
+* ![screenshot](examples/example4.png)
+* ![screenshot](examples/example5.png)
+* ![screenshot](examples/example6.png)
+* ![screenshot](examples/example7.png)
+* ![screenshot](examples/example8.png)
+* ![screenshot](examples/example9.png)
+* ![screenshot](examples/example10.png)
+* ![screenshot](examples/example11.png)
+* ![screenshot](examples/example12.png)
+
+</details>
