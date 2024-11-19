@@ -1,3 +1,4 @@
+import colorsys
 import os
 import pathlib
 from PIL import Image
@@ -43,12 +44,12 @@ class Model():
             self.G_A_net = define_G(3, 3, 64, "c2pGen", "instance", False, "normal", 0.02, [0])
             self.alias_net = define_G(3, 3, 64, "antialias", "instance", False, "normal", 0.02, [0])
 
-            G_A_state = torch.load(GA_PATH, map_location=str(self.device))
+            G_A_state = torch.load(GA_PATH, map_location=str(self.device), weights_only=True)
             for p in list(G_A_state.keys()):
                 G_A_state["module."+str(p)] = G_A_state.pop(p)
             self.G_A_net.load_state_dict(G_A_state)
 
-            alias_state = torch.load(ALIAS_PATH, map_location=str(self.device))
+            alias_state = torch.load(ALIAS_PATH, map_location=str(self.device), weights_only=True)
             for p in list(alias_state.keys()):
                 alias_state["module."+str(p)] = alias_state.pop(p)
             self.alias_net.load_state_dict(alias_state)
@@ -100,26 +101,46 @@ def save(tensor, cell_size, best_cell_size=4):
     #img.save(file)
     return img
 
+def color_image(img, original_img):
+    img = img.convert("RGB")
+    original_img = original_img.convert("RGB")
+
+    colored_img = Image.new("RGB", img.size)
+
+    for x in range(img.width):
+        for y in range(img.height):
+            pixel = original_img.getpixel((x, y))
+            r, g, b = pixel
+            original_h, original_s, original_v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+
+            pixel = img.getpixel((x, y))
+            r, g, b = pixel
+            h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+
+            # r, g, b = colorsys.hsv_to_rgb(original_h if copy_hue else h, original_s if copy_sat else s, v)
+            r, g, b = colorsys.hsv_to_rgb(original_h, original_s, v)
+            colored_img.putpixel((x, y), (int(r * 255), int(g * 255), int(b * 255)))
+
+    return colored_img
 
 @invocation(
     "pixelize",
     title="Pixelize Image",
     tags=["image", "retro", "pixel", "pixel art"],
     category="image",
-    version="1.0.1",
+    version="1.1.0",
 )
 class PixelizeImageInvocation(BaseInvocation, WithMetadata, WithBoard):
     """Creates 'pixel' 'art' using trained models"""
 
-    image: ImageField = InputField(description="The image to pixelize")
-    cell_size: int    = InputField(default=4, ge=2, le=32, 
+    image: ImageField    = InputField(description="The image to pixelize")
+    correct_colors: bool = InputField(default=True, description="Correct hue and saturation to match original image.")
+    cell_size: int       = InputField(default=4, ge=2, le=32, 
                                    description="pixel/cell size (min 2 max WHATEVER BRO)")
-
 
 
     def invoke(self, context: InvocationContext) -> ImageOutput:
         image = context.images.get_pil(self.image.image_name)
-
 
         m = Model()
         m.load()
@@ -127,6 +148,9 @@ class PixelizeImageInvocation(BaseInvocation, WithMetadata, WithBoard):
 
         del m
         TorchDevice.empty_cache()
+
+        if self.correct_colors:
+            out_image = color_image(out_image, image)
 
         image_dto = context.images.save(image=out_image)
 
